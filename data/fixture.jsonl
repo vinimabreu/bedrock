@@ -1,0 +1,70 @@
+{"id": "total_revenue", "run": 0, "sql": "SELECT ROUND(SUM(quantity * unit_price), 2) AS revenue FROM order_items"}
+{"id": "total_revenue", "run": 1, "sql": "SELECT ROUND(SUM(unit_price), 2) AS revenue FROM order_items"}
+{"id": "total_revenue", "run": 2, "sql": "SELECT ROUND(SUM(quantity * unit_price), 2) AS revenue FROM order_items"}
+{"id": "total_revenue", "run": 3, "sql": "SELECT ROUND(SUM(unit_price), 2) AS revenue FROM order_items"}
+{"id": "total_revenue", "run": 4, "sql": "SELECT ROUND(SUM(quantity * unit_price), 2) AS revenue FROM order_items"}
+{"id": "num_customers", "run": 0, "sql": "SELECT COUNT(*) AS n FROM customers"}
+{"id": "num_customers", "run": 1, "sql": "SELECT COUNT(*) AS n FROM customers"}
+{"id": "num_customers", "run": 2, "sql": "SELECT COUNT(*) AS n FROM customers"}
+{"id": "num_customers", "run": 3, "sql": "SELECT COUNT(*) AS n FROM customers"}
+{"id": "num_customers", "run": 4, "sql": "SELECT COUNT(*) AS n FROM customers"}
+{"id": "num_orders", "run": 0, "sql": "SELECT COUNT(*) AS n FROM orders"}
+{"id": "num_orders", "run": 1, "sql": "SELECT COUNT(*) AS n FROM orders"}
+{"id": "num_orders", "run": 2, "sql": "SELECT COUNT(*) AS n FROM orders"}
+{"id": "num_orders", "run": 3, "sql": "SELECT COUNT(*) AS n FROM orders"}
+{"id": "num_orders", "run": 4, "sql": "SELECT COUNT(*) AS n FROM orders"}
+{"id": "completed_orders", "run": 0, "sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'completed'"}
+{"id": "completed_orders", "run": 1, "sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'completed'"}
+{"id": "completed_orders", "run": 2, "sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'completed'"}
+{"id": "completed_orders", "run": 3, "sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'completed'"}
+{"id": "completed_orders", "run": 4, "sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'completed'"}
+{"id": "revenue_completed", "run": 0, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE o.status = 'completed'"}
+{"id": "revenue_completed", "run": 1, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.id"}
+{"id": "revenue_completed", "run": 2, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE o.status = 'completed'"}
+{"id": "revenue_completed", "run": 3, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.id"}
+{"id": "revenue_completed", "run": 4, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE o.status = 'completed'"}
+{"id": "top_category", "run": 0, "sql": "SELECT p.category, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.category ORDER BY revenue DESC LIMIT 1"}
+{"id": "top_category", "run": 1, "sql": "SELECT p.category, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.category ORDER BY revenue DESC LIMIT 1"}
+{"id": "top_category", "run": 2, "sql": "SELECT p.category, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.category ORDER BY revenue DESC LIMIT 1"}
+{"id": "top_category", "run": 3, "sql": "SELECT p.category, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.category ORDER BY revenue DESC LIMIT 1"}
+{"id": "top_category", "run": 4, "sql": "SELECT p.category, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.category ORDER BY revenue DESC LIMIT 1"}
+{"id": "num_products", "run": 0, "sql": "SELECT COUNT(*) AS n FROM products"}
+{"id": "num_products", "run": 1, "sql": "SELECT COUNT(*) AS n FROM products"}
+{"id": "num_products", "run": 2, "sql": "SELECT COUNT(*) AS n FROM products"}
+{"id": "num_products", "run": 3, "sql": "SELECT COUNT(*) AS n FROM products"}
+{"id": "num_products", "run": 4, "sql": "SELECT COUNT(*) AS n FROM products"}
+{"id": "customers_per_country", "run": 0, "sql": "SELECT country, COUNT(*) AS n FROM customers GROUP BY country ORDER BY n DESC, country"}
+{"id": "customers_per_country", "run": 1, "sql": "SELECT country, COUNT(*) AS n FROM customers GROUP BY country ORDER BY n DESC, country"}
+{"id": "customers_per_country", "run": 2, "sql": "SELECT country, COUNT(*) AS n FROM customers GROUP BY country ORDER BY n DESC, country"}
+{"id": "customers_per_country", "run": 3, "sql": "SELECT country, COUNT(*) AS n FROM customers GROUP BY country ORDER BY n DESC, country"}
+{"id": "customers_per_country", "run": 4, "sql": "SELECT country, COUNT(*) AS n FROM customers GROUP BY country ORDER BY n DESC, country"}
+{"id": "avg_order_value", "run": 0, "sql": "SELECT ROUND(AVG(t.total), 2) AS avg_order_value FROM (SELECT order_id, SUM(quantity * unit_price) AS total FROM order_items GROUP BY order_id) t"}
+{"id": "avg_order_value", "run": 1, "sql": "SELECT ROUND(AVG(t.total), 2) AS avg_order_value FROM (SELECT order_id, SUM(quantity * unit_price) AS total FROM order_items GROUP BY order_id) t"}
+{"id": "avg_order_value", "run": 2, "sql": "SELECT ROUND(AVG(t.total), 2) AS avg_order_value FROM (SELECT order_id, SUM(quantity * unit_price) AS total FROM order_items GROUP BY order_id) t"}
+{"id": "avg_order_value", "run": 3, "sql": "SELECT ROUND(AVG(t.total), 2) AS avg_order_value FROM (SELECT order_id, SUM(quantity * unit_price) AS total FROM order_items GROUP BY order_id) t"}
+{"id": "avg_order_value", "run": 4, "sql": "SELECT ROUND(AVG(t.total), 2) AS avg_order_value FROM (SELECT order_id, SUM(quantity * unit_price) AS total FROM order_items GROUP BY order_id) t"}
+{"id": "cancelled_orders", "run": 0, "sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'cancelled'"}
+{"id": "cancelled_orders", "run": 1, "sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'cancelled'"}
+{"id": "cancelled_orders", "run": 2, "sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'cancelled'"}
+{"id": "cancelled_orders", "run": 3, "sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'cancelled'"}
+{"id": "cancelled_orders", "run": 4, "sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'cancelled'"}
+{"id": "revenue_2026", "run": 0, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE o.order_date >= '2026-01-01'"}
+{"id": "revenue_2026", "run": 1, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE o.order_date >= '2026-01-01'"}
+{"id": "revenue_2026", "run": 2, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE o.order_date >= '2026-01-01'"}
+{"id": "revenue_2026", "run": 3, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE o.order_date >= '2026-01-01'"}
+{"id": "revenue_2026", "run": 4, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE o.order_date >= '2026-01-01'"}
+{"id": "revenue_computers", "run": 0, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE p.category = 'Computers'"}
+{"id": "revenue_computers", "run": 1, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE p.category = 'Computer'"}
+{"id": "revenue_computers", "run": 2, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE p.category = 'Computers'"}
+{"id": "revenue_computers", "run": 3, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE p.category = 'Computer'"}
+{"id": "revenue_computers", "run": 4, "sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE p.category = 'Computers'"}
+{"id": "top_product_by_quantity", "run": 0, "sql": "SELECT p.name, SUM(oi.quantity) AS units FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.id, p.name ORDER BY units DESC, p.name LIMIT 1"}
+{"id": "top_product_by_quantity", "run": 1, "sql": "SELECT p.name, SUM(oi.quantity) AS units FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.id, p.name ORDER BY units DESC, p.name LIMIT 1"}
+{"id": "top_product_by_quantity", "run": 2, "sql": "SELECT p.name, SUM(oi.quantity) AS units FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.id, p.name ORDER BY units DESC, p.name LIMIT 1"}
+{"id": "top_product_by_quantity", "run": 3, "sql": "SELECT p.name, SUM(oi.quantity) AS units FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.id, p.name ORDER BY units DESC, p.name LIMIT 1"}
+{"id": "top_product_by_quantity", "run": 4, "sql": "SELECT p.name, SUM(oi.quantity) AS units FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.id, p.name ORDER BY units DESC, p.name LIMIT 1"}
+{"id": "repeat_customers", "run": 0, "sql": "SELECT COUNT(*) AS n FROM (SELECT customer_id FROM orders GROUP BY customer_id HAVING COUNT(*) > 1) t"}
+{"id": "repeat_customers", "run": 1, "sql": "SELECT COUNT(*) AS n FROM (SELECT customer_id FROM orders GROUP BY customer_id HAVING COUNT(*) > 1) t"}
+{"id": "repeat_customers", "run": 2, "sql": "SELECT COUNT(*) AS n FROM (SELECT customer_id FROM orders GROUP BY customer_id HAVING COUNT(*) > 1) t"}
+{"id": "repeat_customers", "run": 3, "sql": "SELECT COUNT(*) AS n FROM (SELECT customer_id FROM orders GROUP BY customer_id HAVING COUNT(*) > 1) t"}
+{"id": "repeat_customers", "run": 4, "sql": "SELECT COUNT(*) AS n FROM (SELECT customer_id FROM orders GROUP BY customer_id HAVING COUNT(*) > 1) t"}

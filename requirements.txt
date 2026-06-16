@@ -1,0 +1,3 @@
+# Core (report, gate, tests) is Python 3.10+ standard library only.
+# The Anthropic SDK is needed ONLY for the live agent (report --live, record).
+anthropic>=0.40.0

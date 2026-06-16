@@ -1,0 +1,76 @@
+[
+  {
+    "id": "total_revenue",
+    "question": "What is the total revenue across all order items?",
+    "answer_sql": "SELECT ROUND(SUM(quantity * unit_price), 2) AS revenue FROM order_items",
+    "buggy_sql": "SELECT ROUND(SUM(unit_price), 2) AS revenue FROM order_items"
+  },
+  {
+    "id": "num_customers",
+    "question": "How many customers are there?",
+    "answer_sql": "SELECT COUNT(*) AS n FROM customers"
+  },
+  {
+    "id": "num_orders",
+    "question": "How many orders have been placed?",
+    "answer_sql": "SELECT COUNT(*) AS n FROM orders"
+  },
+  {
+    "id": "completed_orders",
+    "question": "How many orders have the status 'completed'?",
+    "answer_sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'completed'"
+  },
+  {
+    "id": "revenue_completed",
+    "question": "What is the total revenue from completed orders only?",
+    "answer_sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE o.status = 'completed'",
+    "buggy_sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.id"
+  },
+  {
+    "id": "top_category",
+    "question": "Which product category has the highest total revenue?",
+    "answer_sql": "SELECT p.category, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.category ORDER BY revenue DESC LIMIT 1",
+    "buggy_sql": "SELECT p.category, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.category ORDER BY revenue ASC LIMIT 1"
+  },
+  {
+    "id": "num_products",
+    "question": "How many products are in the catalog?",
+    "answer_sql": "SELECT COUNT(*) AS n FROM products"
+  },
+  {
+    "id": "customers_per_country",
+    "question": "How many customers are there in each country?",
+    "answer_sql": "SELECT country, COUNT(*) AS n FROM customers GROUP BY country ORDER BY n DESC, country"
+  },
+  {
+    "id": "avg_order_value",
+    "question": "What is the average order value (total revenue per order)?",
+    "answer_sql": "SELECT ROUND(AVG(t.total), 2) AS avg_order_value FROM (SELECT order_id, SUM(quantity * unit_price) AS total FROM order_items GROUP BY order_id) t"
+  },
+  {
+    "id": "cancelled_orders",
+    "question": "How many orders were cancelled?",
+    "answer_sql": "SELECT COUNT(*) AS n FROM orders WHERE status = 'cancelled'"
+  },
+  {
+    "id": "revenue_2026",
+    "question": "What is the total revenue from orders placed in 2026 or later?",
+    "answer_sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE o.order_date >= '2026-01-01'"
+  },
+  {
+    "id": "revenue_computers",
+    "question": "What is the total revenue from products in the Computers category?",
+    "answer_sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE p.category = 'Computers'",
+    "buggy_sql": "SELECT ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE p.category = 'Computer'"
+  },
+  {
+    "id": "top_product_by_quantity",
+    "question": "Which product has sold the most units?",
+    "answer_sql": "SELECT p.name, SUM(oi.quantity) AS units FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.id, p.name ORDER BY units DESC, p.name LIMIT 1"
+  },
+  {
+    "id": "repeat_customers",
+    "question": "How many customers have placed more than one order?",
+    "answer_sql": "SELECT COUNT(*) AS n FROM (SELECT customer_id FROM orders GROUP BY customer_id HAVING COUNT(*) > 1) t"
+  }
+]

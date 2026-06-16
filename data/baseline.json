@@ -1,0 +1,85 @@
+{
+  "metrics": {
+    "n_questions": 14,
+    "k": 5,
+    "stable_correct": 11,
+    "flaky": 3,
+    "stable_wrong": 0,
+    "error": 0,
+    "trust_rate": 0.7857,
+    "mean_accuracy": 0.9143,
+    "mean_flip_rate": 0.0857
+  },
+  "per_question": {
+    "total_revenue": {
+      "verdict": "flaky",
+      "accuracy": 0.6,
+      "flip_rate": 0.4
+    },
+    "num_customers": {
+      "verdict": "stable_correct",
+      "accuracy": 1.0,
+      "flip_rate": 0.0
+    },
+    "num_orders": {
+      "verdict": "stable_correct",
+      "accuracy": 1.0,
+      "flip_rate": 0.0
+    },
+    "completed_orders": {
+      "verdict": "stable_correct",
+      "accuracy": 1.0,
+      "flip_rate": 0.0
+    },
+    "revenue_completed": {
+      "verdict": "flaky",
+      "accuracy": 0.6,
+      "flip_rate": 0.4
+    },
+    "top_category": {
+      "verdict": "stable_correct",
+      "accuracy": 1.0,
+      "flip_rate": 0.0
+    },
+    "num_products": {
+      "verdict": "stable_correct",
+      "accuracy": 1.0,
+      "flip_rate": 0.0
+    },
+    "customers_per_country": {
+      "verdict": "stable_correct",
+      "accuracy": 1.0,
+      "flip_rate": 0.0
+    },
+    "avg_order_value": {
+      "verdict": "stable_correct",
+      "accuracy": 1.0,
+      "flip_rate": 0.0
+    },
+    "cancelled_orders": {
+      "verdict": "stable_correct",
+      "accuracy": 1.0,
+      "flip_rate": 0.0
+    },
+    "revenue_2026": {
+      "verdict": "stable_correct",
+      "accuracy": 1.0,
+      "flip_rate": 0.0
+    },
+    "revenue_computers": {
+      "verdict": "flaky",
+      "accuracy": 0.6,
+      "flip_rate": 0.4
+    },
+    "top_product_by_quantity": {
+      "verdict": "stable_correct",
+      "accuracy": 1.0,
+      "flip_rate": 0.0
+    },
+    "repeat_customers": {
+      "verdict": "stable_correct",
+      "accuracy": 1.0,
+      "flip_rate": 0.0
+    }
+  }
+}
