@@ -12,6 +12,28 @@ env:
   vars:
     ANTHROPIC_API_KEY:
       secret: true
+    ANTHROPIC_MODEL:
+      default: claude-sonnet-4-6
+    BEDROCK_MAX_RETRIES:
+      default: "3"
+    BEDROCK_MAX_ROWS:
+      default: "1000"
+    BEDROCK_QUERY_TIMEOUT_S:
+      default: "5.0"
+    BEDROCK_DB:
+      default: data/store.db
+    BEDROCK_GOLD:
+      default: data/gold.json
+    BEDROCK_FIXTURE:
+      default: data/fixture.jsonl
+    BEDROCK_BASELINE:
+      default: data/baseline.json
+    BEDROCK_K:
+      default: "5"
+    BEDROCK_FLOAT_TOL:
+      default: "2"
+    BEDROCK_MAX_DROP:
+      default: "0.05"
 
 checks:
   - name: committed-sql-fixture
@@ -195,6 +217,16 @@ tasks:
   gate:
     description: Compare the committed replay candidate against the defended stability baseline
     category: verify
+    replay_inputs:
+      - id: recorded_sql
+        kind: static_file
+        path: data/fixture.jsonl
+      - id: frozen_store
+        kind: static_file
+        path: data/store.db
+      - id: defended_baseline
+        kind: static_file
+        path: data/baseline.json
     command:
       exe: python
       args:
@@ -265,6 +297,17 @@ tasks:
       This is intentionally outside the deterministic pressure proof. It reaches a live model,
       rewrites the recorded SQL fixture, and depends on a generic unpinned pip requirements path
       that Ota does not yet own through typed dependency hydration.
+
+workflows:
+  default: verify
+  verify:
+    intent: ci_validation
+    description: Replay the committed SQL fixture and block stability regressions against the defended baseline
+    run:
+      task: gate
+    notes: |
+      This is the deterministic offline verification lane. It proves the declared fixture, store,
+      and baseline inputs only; live model generation remains intentionally outside this workflow.
 
 agent:
   posture: readiness_strict
