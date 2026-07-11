@@ -1,0 +1,309 @@
+# <!--
+#                 █████
+#                ░░███
+#        ██████  ███████    ██████
+#       ███░░███░░░███░    ░░░░░███
+#      ░███ ░███  ░███      ███████
+#      ░███ ░███  ░███ ███ ███░░███
+#       ░░██████   ░░█████ ░░████████
+#       ░░░░░░     ░░░░░   ░░░░░░░░
+#
+#    Copyright (C) 2026 — 2026, Ota. All Rights Reserved.
+#
+#    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    Unless required by applicable law or agreed to in writing, software distributed under the
+#    License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+#    either express or implied. See the License for the specific language governing permissions
+#    and limitations under the License.
+# -->
+
+version: 1
+project:
+  name: bedrock-replay-stability
+  description: Deterministic offline NL-to-SQL stability replay with an explicitly separate live recording lane
+  type: application
+
+toolchains:
+  python:
+    version: ">=3.10,<3.14"
+
+env:
+  vars:
+    ANTHROPIC_API_KEY:
+      secret: true
+
+checks:
+  - name: committed-sql-fixture
+    kind: file
+    severity: error
+    path: data/fixture.jsonl
+    expect: file
+  - name: frozen-sqlite-store
+    kind: file
+    severity: error
+    path: data/store.db
+    expect: file
+  - name: defended-baseline
+    kind: file
+    severity: error
+    path: data/baseline.json
+    expect: file
+
+tasks:
+  test:equivalence:
+    description: Verify deterministic result-set canonicalization
+    category: test
+    internal: true
+    command:
+      exe: python
+      args:
+        - -B
+        - tests/test_equivalence.py
+    variants:
+      - when:
+          os: linux
+        command:
+          exe: python3
+          args:
+            - -B
+            - tests/test_equivalence.py
+      - when:
+          os: macos
+        command:
+          exe: python3
+          args:
+            - -B
+            - tests/test_equivalence.py
+    requirements:
+      toolchains:
+        - python
+    safe_for_agent: true
+
+  test:harness:
+    description: Verify K-run stability scoring and flapping detection
+    category: test
+    internal: true
+    command:
+      exe: python
+      args:
+        - -B
+        - tests/test_harness.py
+    variants:
+      - when:
+          os: linux
+        command:
+          exe: python3
+          args:
+            - -B
+            - tests/test_harness.py
+      - when:
+          os: macos
+        command:
+          exe: python3
+          args:
+            - -B
+            - tests/test_harness.py
+    requirements:
+      toolchains:
+        - python
+    safe_for_agent: true
+
+  test:gate:
+    description: Verify the stability regression gate
+    category: test
+    internal: true
+    command:
+      exe: python
+      args:
+        - -B
+        - tests/test_gate.py
+    variants:
+      - when:
+          os: linux
+        command:
+          exe: python3
+          args:
+            - -B
+            - tests/test_gate.py
+      - when:
+          os: macos
+        command:
+          exe: python3
+          args:
+            - -B
+            - tests/test_gate.py
+    requirements:
+      toolchains:
+        - python
+    safe_for_agent: true
+
+  test:hardening:
+    description: Verify fixture coverage and malformed-run failure behavior
+    category: test
+    internal: true
+    command:
+      exe: python
+      args:
+        - -B
+        - tests/test_hardening.py
+    variants:
+      - when:
+          os: linux
+        command:
+          exe: python3
+          args:
+            - -B
+            - tests/test_hardening.py
+      - when:
+          os: macos
+        command:
+          exe: python3
+          args:
+            - -B
+            - tests/test_hardening.py
+    requirements:
+      toolchains:
+        - python
+    safe_for_agent: true
+
+  test:
+    description: Run the deterministic no-key verification surface
+    category: test
+    aggregate:
+      tasks:
+        - test:equivalence
+        - test:harness
+        - test:gate
+        - test:hardening
+    safe_for_agent: true
+
+  report:
+    description: Replay the committed SQL fixture against the frozen SQLite store and print the K-run scorecard
+    category: verify
+    command:
+      exe: python
+      args:
+        - -B
+        - main.py
+        - report
+    variants:
+      - when:
+          os: linux
+        command:
+          exe: python3
+          args:
+            - -B
+            - main.py
+            - report
+      - when:
+          os: macos
+        command:
+          exe: python3
+          args:
+            - -B
+            - main.py
+            - report
+    requirements:
+      toolchains:
+        - python
+    safe_for_agent: true
+    notes: |
+      This is an offline replay of recorded SQL against committed fixture and store inputs. It
+      does not prove live-model generation or live external-state behavior.
+
+  gate:
+    description: Compare the committed replay candidate against the defended stability baseline
+    category: verify
+    command:
+      exe: python
+      args:
+        - -B
+        - main.py
+        - gate
+    variants:
+      - when:
+          os: linux
+        command:
+          exe: python3
+          args:
+            - -B
+            - main.py
+            - gate
+      - when:
+          os: macos
+        command:
+          exe: python3
+          args:
+            - -B
+            - main.py
+            - gate
+    requirements:
+      toolchains:
+        - python
+    safe_for_agent: true
+    notes: |
+      This gate proves the recorded candidate does not regress against the committed baseline.
+      It does not prove that a live model or live database will reproduce the same result.
+
+  record:live:
+    description: Record fresh SQL from the live Claude-backed agent for a later replay fixture
+    category: verify
+    command:
+      exe: python
+      args:
+        - main.py
+        - record
+    variants:
+      - when:
+          os: linux
+        command:
+          exe: python3
+          args:
+            - main.py
+            - record
+      - when:
+          os: macos
+        command:
+          exe: python3
+          args:
+            - main.py
+            - record
+    requirements:
+      toolchains:
+        - python
+      env:
+        - ANTHROPIC_API_KEY
+    effects:
+      writes:
+        - data/fixture.jsonl
+      network: true
+      network_kind: integration_test
+      external_state:
+        - anthropic_api
+    notes: |
+      This is intentionally outside the deterministic pressure proof. It reaches a live model,
+      rewrites the recorded SQL fixture, and depends on a generic unpinned pip requirements path
+      that Ota does not yet own through typed dependency hydration.
+
+agent:
+  posture: readiness_strict
+  entrypoint: test
+  default_task: test
+  safe_tasks:
+    - test
+    - report
+    - gate
+  protected_paths:
+    - .github/workflows
+    - data/baseline.json
+    - data/fixture.jsonl
+    - data/store.db
+  bootstrap:
+    ota:
+      note: Only install ota if it is missing and installation is approved.
+      source:
+        kind: branch
+        branch: 1.6.24-implementation
