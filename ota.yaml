@@ -227,6 +227,10 @@ tasks:
       - id: defended_baseline
         kind: static_file
         path: data/baseline.json
+    witnessed_observations:
+      query_traces:
+        - id: recorded_sql
+          path: data/fixture.jsonl
     command:
       exe: python
       args:
