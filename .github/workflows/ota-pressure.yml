@@ -45,6 +45,12 @@ jobs:
       - name: Preview deterministic replay surface
         run: ota run gate --agent --dry-run
 
+      - name: Preview deterministic replay workflow
+        run: ota up --workflow verify --agent --dry-run
+
+      - name: Prepare deterministic replay workflow
+        run: ota up --workflow verify --agent
+
       - name: Run deterministic tests
         run: ota run test --agent
 
@@ -53,3 +59,6 @@ jobs:
 
       - name: Evaluate the stability gate
         run: ota run gate --agent
+
+      - name: Archive workflow receipt
+        run: ota receipt --workflow verify --json --archive .
