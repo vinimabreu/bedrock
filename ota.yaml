@@ -4,6 +4,21 @@ project:
   description: Deterministic offline NL-to-SQL stability replay with an explicitly separate live recording lane
   type: application
 
+execution:
+  default_context: host
+  backends:
+    container:
+      image: python@sha256:eb43ff125d8d58d7449dcba7d336c23bcac412f526d861db493b9994d8010280
+      engines: [docker]
+  contexts:
+    host:
+      backend: native
+    replay:container:
+      backend: container
+      lifecycle: ephemeral
+      container:
+        image: python@sha256:eb43ff125d8d58d7449dcba7d336c23bcac412f526d861db493b9994d8010280
+
 toolchains:
   python:
     version: ">=3.10,<3.14"
@@ -183,6 +198,20 @@ tasks:
   report:
     description: Replay the committed SQL fixture against the frozen SQLite store and print the K-run scorecard
     category: verify
+    replay_inputs:
+      - id: recorded_sql
+        kind: static_file
+        path: data/fixture.jsonl
+      - id: frozen_store
+        kind: static_file
+        path: data/store.db
+      - id: equivalence
+        kind: comparator_profile
+        path: app/equivalence.py
+    witnessed_observations:
+      query_traces:
+        - id: recorded_sql
+          path: data/fixture.jsonl
     command:
       exe: python
       args:
@@ -210,6 +239,10 @@ tasks:
       toolchains:
         - python
     safe_for_agent: true
+    execution:
+      modes:
+        container:
+          context: replay:container
     notes: |
       This is an offline replay of recorded SQL against committed fixture and store inputs. It
       does not prove live-model generation or live external-state behavior.
@@ -224,6 +257,9 @@ tasks:
       - id: frozen_store
         kind: static_file
         path: data/store.db
+      - id: equivalence
+        kind: comparator_profile
+        path: app/equivalence.py
       - id: defended_baseline
         kind: static_file
         path: data/baseline.json
@@ -258,6 +294,10 @@ tasks:
       toolchains:
         - python
     safe_for_agent: true
+    execution:
+      modes:
+        container:
+          context: replay:container
     notes: |
       This gate proves the recorded candidate does not regress against the committed baseline.
       It does not prove that a live model or live database will reproduce the same result.

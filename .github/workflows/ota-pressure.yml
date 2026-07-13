@@ -62,3 +62,41 @@ jobs:
 
       - name: Archive workflow receipt
         run: ota receipt --workflow verify --json --archive .
+
+  container-replay:
+    name: Deterministic replay (container)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ota-run/setup@v1
+        with:
+          source: contract
+          contract-path: ota.yaml
+
+      - name: Validate contract
+        run: ota validate .
+
+      - name: Diagnose container replay readiness
+        run: ota doctor --workflow verify --container .
+
+      - name: List runnable task modes
+        run: ota tasks --use .
+
+      - name: List agent-safe task modes
+        run: ota tasks --safe --use .
+
+      - name: Preview container replay workflow
+        run: ota up --workflow verify --container --agent --dry-run .
+
+      - name: Execute container replay workflow
+        run: ota up --workflow verify --container --agent .
+
+      - name: Replay the recorded SQL scorecard in the container
+        run: ota run report --container --agent .
+
+      - name: Evaluate the stability gate in the container
+        run: ota run gate --container --agent .
+
+      - name: Archive container workflow receipt
+        run: ota receipt --workflow verify --json --archive .
