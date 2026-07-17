@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Fail on contract-to-CI workflow drift
-        uses: ota-run/action@051fd5861306843d62a7fd62952c5fe9bcda269f # v1.0.14
+        uses: ota-run/action@6bb5bf686df5a8385202c8c20b6f91c045e3c161 # v1.0.15
         with:
           command: doctor
           source: contract
