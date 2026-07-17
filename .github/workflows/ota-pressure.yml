@@ -11,6 +11,21 @@ permissions:
   contents: read
 
 jobs:
+  contract-ci-drift:
+    name: Contract-to-CI drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail on contract-to-CI workflow drift
+        uses: ota-run/action@051fd5861306843d62a7fd62952c5fe9bcda269f # v1.0.14
+        with:
+          command: doctor
+          source: contract
+          fail-on-error: false
+          fail-on-ci-drift: true
+          comment-pr: false
+
   deterministic-replay:
     name: Deterministic replay (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
