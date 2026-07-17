@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: '3.13'
 
-      - uses: ota-run/setup@v1
+      - uses: ota-run/setup@493cba84bf7f7c11c9e8e996d832d93a89c62184 # v1.0.8
         with:
           source: contract
           contract-path: ota.yaml
@@ -69,7 +69,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ota-run/setup@v1
+      - uses: ota-run/setup@493cba84bf7f7c11c9e8e996d832d93a89c62184 # v1.0.8
         with:
           source: contract
           contract-path: ota.yaml
