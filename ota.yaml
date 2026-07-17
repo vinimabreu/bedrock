@@ -202,12 +202,15 @@ tasks:
       - id: recorded_sql
         kind: static_file
         path: data/fixture.jsonl
+        expected_identity: sha256:de860b6f54303a4bed43a3d4cab39cd2d44c8d4eb65593bc0914b7ff0fadd245
       - id: frozen_store
         kind: static_file
         path: data/store.db
+        expected_identity: sha256:e058b68852e773b0b86f869b161ff29886c900bb23cd3af67ae93a96331fb0b6
       - id: equivalence
         kind: comparator_profile
         path: app/equivalence.py
+        expected_identity: sha256:08b15edb2b5b9a66520f172c696846f4181f63d43f56477f01c4cfce4f61abef
     witnessed_observations:
       query_traces:
         - id: recorded_sql
@@ -254,15 +257,19 @@ tasks:
       - id: recorded_sql
         kind: static_file
         path: data/fixture.jsonl
+        expected_identity: sha256:de860b6f54303a4bed43a3d4cab39cd2d44c8d4eb65593bc0914b7ff0fadd245
       - id: frozen_store
         kind: static_file
         path: data/store.db
+        expected_identity: sha256:e058b68852e773b0b86f869b161ff29886c900bb23cd3af67ae93a96331fb0b6
       - id: equivalence
         kind: comparator_profile
         path: app/equivalence.py
+        expected_identity: sha256:08b15edb2b5b9a66520f172c696846f4181f63d43f56477f01c4cfce4f61abef
       - id: defended_baseline
         kind: static_file
         path: data/baseline.json
+        expected_identity: sha256:18db24e2ebc20c0b781942eb515dc9a466d6d36f09bf5e763e3e8998b36aa2c8
     witnessed_observations:
       query_traces:
         - id: recorded_sql
