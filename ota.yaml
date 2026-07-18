@@ -356,9 +356,12 @@ workflows:
     description: Replay the committed SQL fixture and block stability regressions against the defended baseline
     run:
       task: gate
+    proof:
+      claim: bounded
     notes: |
       This is the deterministic offline verification lane. It proves the declared fixture, store,
       and baseline inputs only; live model generation remains intentionally outside this workflow.
+      Its proof-breadth claim remains unknown until Ota archives a matching execution-authored proof.
 
 agent:
   posture: readiness_strict
@@ -377,5 +380,5 @@ agent:
     ota:
       note: Only install ota if it is missing and installation is approved.
       source:
-        kind: version
-        version: v1.6.24
+        kind: branch
+        branch: 1.6.25-implementation

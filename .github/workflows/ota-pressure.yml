@@ -51,6 +51,23 @@ jobs:
       - name: Diagnose readiness
         run: ota doctor
 
+      - name: Assert bounded proof is unknown before archival evidence exists
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          ota doctor --json . > "$RUNNER_TEMP/ota-doctor-proof-before-archive.json"
+          jq -e '
+            .claim_assurance
+            | any(
+              .subject.kind == "workflow"
+              and .subject.name == "verify"
+              and .family == "proof_breadth"
+              and .declaration.value == "bounded_proof"
+              and .assurance.status == "unknown"
+              and (.assurance.gaps | index("immutable_proof_archive") != null)
+            )
+          ' "$RUNNER_TEMP/ota-doctor-proof-before-archive.json"
+
       - name: List runnable tasks
         run: ota tasks --use
 
@@ -74,6 +91,28 @@ jobs:
 
       - name: Evaluate the stability gate
         run: ota run gate --agent
+
+      - name: Archive bounded replay proof and assert supported assurance
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          ota proof runtime --workflow verify --native --json --archive . > "$RUNNER_TEMP/ota-proof-verify.json"
+          ota doctor --json . > "$RUNNER_TEMP/ota-doctor-proof-after-archive.json"
+          jq -e '
+            .claim_assurance
+            | any(
+              .subject.kind == "workflow"
+              and .subject.name == "verify"
+              and .family == "proof_breadth"
+              and .declaration.value == "bounded_proof"
+              and .assurance.status == "supported"
+              and (.assurance.coverage | index("immutable_proof_archive") != null)
+              and (.assurance.evidence | any(
+                .source == ".ota/proof/archives"
+                and .evidence_class == "attested"
+              ))
+            )
+          ' "$RUNNER_TEMP/ota-doctor-proof-after-archive.json"
 
       - name: Archive workflow receipt
         run: ota receipt --workflow verify --json --archive .
