@@ -15,6 +15,8 @@ that **flap** before they reach a customer. It turns "works in the demo, breaks
 in production" from a vibe into a number and a build that fails when the agent
 gets less trustworthy.
 
+![Bedrock runs one gold question K times through the agent, compares every run against a defended answer key, and flags the questions that flap before they reach a customer.](docs/bedrock.gif)
+
 ```
 ================================================================
 BEDROCK STABILITY SCORECARD
