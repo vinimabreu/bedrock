@@ -5,7 +5,7 @@
   python main.py baseline               save the current run as the baseline
   python main.py gate                   block if the candidate regresses (exit 1)
   python main.py gate --candidate data/fixture_candidate.jsonl
-  python main.py record --fixture data/fixture.jsonl   re-record from a live model (needs ANTHROPIC_API_KEY)
+  python main.py record --baseline                     record fixture and baseline from a live model (needs ANTHROPIC_API_KEY)
 
 The offline commands replay a committed fixture, so they run with no API key and
 reproduce to the row. --live runs the real Claude agent instead.
@@ -96,6 +96,11 @@ def cmd_record(args):
     schema_text = schema_mod.describe(conn)
     recorder = fixture_mod.RecordingLLM(ClaudeLLM(), path)
     rep = harness.run_stability(conn, items, recorder.for_run, k=args.k or config.K_RUNS, schema_text=schema_text)
+    if args.baseline:
+        payload = {"metrics": rep.metrics(), "per_question": rep.per_question()}
+        with open(config.BASELINE_PATH, "w", encoding="utf-8") as handle:
+            json.dump(payload, handle, indent=2)
+        print(f"baseline recorded to {config.BASELINE_PATH}")
     print(report_mod.render_text(rep))
     print(f"\nrecorded live fixture to {path}")
     return 0
@@ -126,6 +131,11 @@ def main(argv=None):
 
     p_rec = sub.add_parser("record", help="re-record a fixture from a live model")
     p_rec.add_argument("--fixture", help="output fixture path")
+    p_rec.add_argument(
+        "--baseline",
+        action="store_true",
+        help="replace the defended baseline with the same live recording",
+    )
     p_rec.add_argument("--k", type=int)
     p_rec.set_defaults(func=cmd_record)
 

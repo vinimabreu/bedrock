@@ -52,8 +52,8 @@ python main.py report --markdown docs/scorecard.md
 ```
 
 To run the real Claude agent instead of the replay: `python main.py report --live`
-(needs `ANTHROPIC_API_KEY`). Re-record the fixture from a live model with
-`python main.py record`.
+(needs `ANTHROPIC_API_KEY`). The intentional recording lane rewrites the fixture and baseline
+together: `python main.py record --baseline`.
 
 ## Ota
 
@@ -78,6 +78,24 @@ ota up --workflow verify --container
 
 The live recording lane is intentionally separate because it reaches Claude and rewrites the
 recorded fixture. Inspect it with `ota tasks --use` before running it.
+
+When a live recording is intentionally reviewed, Ota can turn it into portable replay authority:
+
+```bash
+# Runs the unsafe live producer; review the fixture and baseline diff first.
+ota baseline record --artifact recorded-replay --json
+
+# Select one exact recorded attestation. This never chooses the latest run automatically.
+ota baseline promote --artifact recorded-replay \
+  --attestation .ota/replay-baselines/recorded-replay/attestation-<sha>.json --json
+
+# The promoted lane refuses without the committed authority manifest.
+ota up --workflow promoted-replay --container
+```
+
+The authority manifest binds the reviewed fixture and baseline identities to their producer receipt.
+It does not turn live model behavior into deterministic proof; it only makes the selected offline
+recording explicit and immutable for replay consumption.
 
 ## The gate: catch a regression as a failed build
 

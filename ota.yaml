@@ -67,6 +67,17 @@ checks:
     path: data/baseline.json
     expect: file
 
+artifacts:
+  recorded-replay:
+    kind: replay_baseline
+    producer: record:baseline
+    paths:
+      - data/fixture.jsonl
+      - data/baseline.json
+    replay:
+      authority_manifest: replay/recorded-replay.ota.json
+      consumption: verify_unchanged
+
 tasks:
   test:equivalence:
     description: Verify deterministic result-set canonicalization
@@ -349,6 +360,149 @@ tasks:
       rewrites the recorded SQL fixture, and depends on a generic unpinned pip requirements path
       that Ota does not yet own through typed dependency hydration.
 
+  record:baseline:
+    description: Explicitly record a fixture and defended baseline together from the live model
+    category: verify
+    command:
+      exe: python
+      args:
+        - main.py
+        - record
+        - --baseline
+    variants:
+      - when:
+          os: linux
+        command:
+          exe: python3
+          args:
+            - main.py
+            - record
+            - --baseline
+      - when:
+          os: macos
+        command:
+          exe: python3
+          args:
+            - main.py
+            - record
+            - --baseline
+    requirements:
+      toolchains:
+        - python
+      env:
+        - ANTHROPIC_API_KEY
+    effects:
+      writes:
+        - data/fixture.jsonl
+        - data/baseline.json
+      network: true
+      network_kind: integration_test
+      external_state:
+        - anthropic_api
+    notes: |
+      This is the only producer for the promoted replay baseline. It is opt-in, reaches a live
+      model, and rewrites both fixture and baseline together. Review its output before promotion.
+
+  report:promoted:
+    description: Replay only the explicitly promoted recorded fixture through Ota baseline authority
+    category: verify
+    replay_inputs:
+      - id: frozen_store
+        kind: static_file
+        path: data/store.db
+        expected_identity: sha256:e058b68852e773b0b86f869b161ff29886c900bb23cd3af67ae93a96331fb0b6
+      - id: equivalence
+        kind: comparator_profile
+        path: app/equivalence.py
+        expected_identity: sha256:08b15edb2b5b9a66520f172c696846f4181f63d43f56477f01c4cfce4f61abef
+    witnessed_observations:
+      query_traces:
+        - id: recorded_sql
+          path: data/fixture.jsonl
+    command:
+      exe: python
+      args:
+        - -B
+        - main.py
+        - report
+    variants:
+      - when:
+          os: linux
+        command:
+          exe: python3
+          args:
+            - -B
+            - main.py
+            - report
+      - when:
+          os: macos
+        command:
+          exe: python3
+          args:
+            - -B
+            - main.py
+            - report
+    requirements:
+      toolchains:
+        - python
+    requires_artifacts:
+      - recorded-replay
+    safe_for_agent: true
+    execution:
+      modes:
+        container:
+          context: replay:container
+
+  gate:promoted:
+    description: Gate a replay only when the recorded fixture and baseline have explicit authority
+    category: verify
+    replay_inputs:
+      - id: frozen_store
+        kind: static_file
+        path: data/store.db
+        expected_identity: sha256:e058b68852e773b0b86f869b161ff29886c900bb23cd3af67ae93a96331fb0b6
+      - id: equivalence
+        kind: comparator_profile
+        path: app/equivalence.py
+        expected_identity: sha256:08b15edb2b5b9a66520f172c696846f4181f63d43f56477f01c4cfce4f61abef
+    witnessed_observations:
+      query_traces:
+        - id: recorded_sql
+          path: data/fixture.jsonl
+    command:
+      exe: python
+      args:
+        - -B
+        - main.py
+        - gate
+    variants:
+      - when:
+          os: linux
+        command:
+          exe: python3
+          args:
+            - -B
+            - main.py
+            - gate
+      - when:
+          os: macos
+        command:
+          exe: python3
+          args:
+            - -B
+            - main.py
+            - gate
+    requirements:
+      toolchains:
+        - python
+    requires_artifacts:
+      - recorded-replay
+    safe_for_agent: true
+    execution:
+      modes:
+        container:
+          context: replay:container
+
 workflows:
   default: verify
   verify:
@@ -362,6 +516,13 @@ workflows:
       This is the deterministic offline verification lane. It proves the declared fixture, store,
       and baseline inputs only; live model generation remains intentionally outside this workflow.
       Its proof-breadth claim remains unknown until Ota archives a matching execution-authored proof.
+  promoted-replay:
+    intent: ci_validation
+    description: Offline replay that consumes a reviewed, explicitly promoted recording authority
+    run:
+      task: gate:promoted
+    proof:
+      claim: bounded
 
 agent:
   posture: readiness_strict
@@ -371,6 +532,8 @@ agent:
     - test
     - report
     - gate
+    - report:promoted
+    - gate:promoted
   protected_paths:
     - .github/workflows
     - data/baseline.json
