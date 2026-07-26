@@ -95,7 +95,15 @@ ota up --workflow promoted-replay --container
 
 The authority manifest binds the reviewed fixture and baseline identities to their producer receipt.
 It does not turn live model behavior into deterministic proof; it only makes the selected offline
-recording explicit and immutable for replay consumption.
+recording explicit and immutable for replay consumption. The promoted proof lane must use
+`--container`: Ota mounts the approved fixture and baseline from a runner-owned snapshot as
+read-only for the selected closure. Native replay does not claim that write-prevention boundary.
+
+For a hosted recording candidate, dispatch **Ota live baseline recording** with `confirm: record`.
+That workflow is environment-gated and requires `ANTHROPIC_API_KEY`; it uploads the changed fixture,
+baseline, and Ota attestation for review. It never promotes or commits the candidate. Review the
+recorded behavior, commit the selected files through the normal review path, then run the explicit
+`ota baseline promote` command against that exact attestation.
 
 ## The gate: catch a regression as a failed build
 

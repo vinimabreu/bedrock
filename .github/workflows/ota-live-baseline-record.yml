@@ -1,0 +1,69 @@
+name: Ota live baseline recording
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type `record` to run the Claude-backed baseline producer.
+        required: true
+        type: choice
+        options:
+          - cancel
+          - record
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ota-bedrock-live-baseline-recording
+  cancel-in-progress: false
+
+jobs:
+  record:
+    if: inputs.confirm == 'record'
+    name: Record review candidate
+    runs-on: ubuntu-latest
+    environment: bedrock-live-recording
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - uses: ota-run/setup@493cba84bf7f7c11c9e8e996d832d93a89c62184 # v1.0.8
+        with:
+          source: contract
+          contract-path: ota.yaml
+
+      - name: Require the live-model credential
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          test -n "$ANTHROPIC_API_KEY" || {
+            echo "ANTHROPIC_API_KEY must be configured on the bedrock-live-recording environment." >&2
+            exit 1
+          }
+
+      - name: Validate the recording contract
+        run: ota validate .
+
+      - name: Record a candidate baseline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          ota baseline record --artifact recorded-replay --json > "$RUNNER_TEMP/ota-baseline-record.json"
+          git diff -- data/fixture.jsonl data/baseline.json > "$RUNNER_TEMP/recorded-baseline.diff"
+
+      - name: Upload the review candidate without promotion
+        uses: actions/upload-artifact@v4
+        with:
+          name: bedrock-live-recording-candidate-${{ github.run_id }}
+          path: |
+            data/fixture.jsonl
+            data/baseline.json
+            .ota/replay-baselines/recorded-replay/
+            ${{ runner.temp }}/ota-baseline-record.json
+            ${{ runner.temp }}/recorded-baseline.diff
+          if-no-files-found: error
+          retention-days: 14

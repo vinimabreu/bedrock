@@ -76,7 +76,7 @@ artifacts:
       - data/baseline.json
     replay:
       authority_manifest: replay/recorded-replay.ota.json
-      consumption: verify_unchanged
+      consumption: read_only
 
 tasks:
   test:equivalence:
