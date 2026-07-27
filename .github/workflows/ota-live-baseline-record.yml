@@ -31,6 +31,11 @@ jobs:
         with:
           python-version: '3.13'
 
+      # The offline suite is dependency-free by design; only this live lane
+      # imports the SDK, so it is installed here and nowhere else.
+      - name: Install the live-model SDK
+        run: pip install anthropic
+
       - uses: ota-run/setup@493cba84bf7f7c11c9e8e996d832d93a89c62184 # v1.0.8
         with:
           source: contract
