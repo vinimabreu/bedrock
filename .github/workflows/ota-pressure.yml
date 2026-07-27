@@ -1,0 +1,156 @@
+name: Ota Pressure
+
+on:
+  push:
+    branches:
+      - bobai/**
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract-ci-drift:
+    name: Contract-to-CI drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail on contract-to-CI workflow drift
+        uses: ota-run/action@6bb5bf686df5a8385202c8c20b6f91c045e3c161 # v1.0.15
+        with:
+          command: doctor
+          source: contract
+          fail-on-error: false
+          fail-on-ci-drift: true
+          comment-pr: false
+
+  deterministic-replay:
+    name: Deterministic replay (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - uses: ota-run/setup@493cba84bf7f7c11c9e8e996d832d93a89c62184 # v1.0.8
+        with:
+          source: contract
+          contract-path: ota.yaml
+
+      - name: Validate contract
+        run: ota validate .
+
+      - name: Diagnose readiness
+        run: ota doctor
+
+      - name: Assert bounded proof is unknown before archival evidence exists
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          ota doctor --json . > "$RUNNER_TEMP/ota-doctor-proof-before-archive.json"
+          jq -e '
+            .claim_assurance
+            | any(
+              .subject.kind == "workflow"
+              and .subject.name == "verify"
+              and .family == "proof_breadth"
+              and .declaration.value == "bounded_proof"
+              and .assurance.status == "unknown"
+              and (.assurance.gaps | index("immutable_proof_archive") != null)
+            )
+          ' "$RUNNER_TEMP/ota-doctor-proof-before-archive.json"
+
+      - name: List runnable tasks
+        run: ota tasks --use
+
+      - name: List agent-safe tasks
+        run: ota tasks --safe --use
+
+      - name: Preview deterministic replay surface
+        run: ota run gate --agent --dry-run
+
+      - name: Preview deterministic replay workflow
+        run: ota up --workflow verify --agent --dry-run
+
+      - name: Prepare deterministic replay workflow
+        run: ota up --workflow verify --agent
+
+      - name: Run deterministic tests
+        run: ota run test --agent
+
+      - name: Replay the recorded SQL scorecard
+        run: ota run report --agent
+
+      - name: Evaluate the stability gate
+        run: ota run gate --agent
+
+      - name: Archive bounded replay proof and assert supported assurance
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          ota proof runtime --workflow verify --native --json --archive . > "$RUNNER_TEMP/ota-proof-verify.json"
+          ota doctor --json . > "$RUNNER_TEMP/ota-doctor-proof-after-archive.json"
+          jq -e '
+            .claim_assurance
+            | any(
+              .subject.kind == "workflow"
+              and .subject.name == "verify"
+              and .family == "proof_breadth"
+              and .declaration.value == "bounded_proof"
+              and .assurance.status == "supported"
+              and (.assurance.coverage | index("immutable_proof_archive") != null)
+              and (.assurance.evidence | any(
+                .source == ".ota/proof/archives"
+                and .evidence_class == "attested"
+              ))
+            )
+          ' "$RUNNER_TEMP/ota-doctor-proof-after-archive.json"
+
+      - name: Archive workflow receipt
+        run: ota receipt --workflow verify --json --archive .
+
+  container-replay:
+    name: Deterministic replay (container)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ota-run/setup@493cba84bf7f7c11c9e8e996d832d93a89c62184 # v1.0.8
+        with:
+          source: contract
+          contract-path: ota.yaml
+
+      - name: Validate contract
+        run: ota validate .
+
+      - name: Diagnose container replay readiness
+        run: ota doctor --workflow verify --container .
+
+      - name: List runnable task modes
+        run: ota tasks --use .
+
+      - name: List agent-safe task modes
+        run: ota tasks --safe --use .
+
+      - name: Preview container replay workflow
+        run: ota up --workflow verify --container --agent --dry-run .
+
+      - name: Execute container replay workflow
+        run: ota up --workflow verify --container --agent .
+
+      - name: Replay the recorded SQL scorecard in the container
+        run: ota run report --container --agent .
+
+      - name: Evaluate the stability gate in the container
+        run: ota run gate --container --agent .
+
+      - name: Archive container workflow receipt
+        run: ota receipt --workflow verify --json --archive .

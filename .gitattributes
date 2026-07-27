@@ -1,0 +1,4 @@
+# Byte-pinned replay inputs must materialize identically on every runner.
+data/fixture.jsonl text eol=lf
+data/baseline.json text eol=lf
+app/equivalence.py text eol=lf
