@@ -68,6 +68,7 @@ jobs:
             data/fixture.jsonl
             data/baseline.json
             .ota/replay-baselines/recorded-replay/
+            .ota/receipts/
             ${{ runner.temp }}/ota-baseline-record.json
             ${{ runner.temp }}/recorded-baseline.diff
           if-no-files-found: error
