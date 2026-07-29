@@ -3,7 +3,7 @@ name: Ota Pressure
 on:
   push:
     branches:
-      - bobai/**
+      - main
   pull_request:
   workflow_dispatch:
 
