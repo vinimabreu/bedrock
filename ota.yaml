@@ -543,5 +543,5 @@ agent:
     ota:
       note: Only install ota if it is missing and installation is approved.
       source:
-        kind: branch
-        branch: 1.6.25-implementation
+        kind: version
+        version: v1.6.25
