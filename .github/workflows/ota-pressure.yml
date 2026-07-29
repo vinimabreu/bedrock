@@ -3,7 +3,7 @@ name: Ota Pressure
 on:
   push:
     branches:
-      - bobai/**
+      - main
   pull_request:
   workflow_dispatch:
 
@@ -15,7 +15,7 @@ jobs:
     name: Contract-to-CI drift
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Fail on contract-to-CI workflow drift
         uses: ota-run/action@6bb5bf686df5a8385202c8c20b6f91c045e3c161 # v1.0.15
@@ -34,13 +34,13 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.13'
 
-      - uses: ota-run/setup@493cba84bf7f7c11c9e8e996d832d93a89c62184 # v1.0.8
+      - uses: ota-run/setup@85bf49c11a5aa3ddedfa56c47682cfd40b238f1f # v1.0.9
         with:
           source: contract
           contract-path: ota.yaml
@@ -121,9 +121,9 @@ jobs:
     name: Deterministic replay (container)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: ota-run/setup@493cba84bf7f7c11c9e8e996d832d93a89c62184 # v1.0.8
+      - uses: ota-run/setup@85bf49c11a5aa3ddedfa56c47682cfd40b238f1f # v1.0.9
         with:
           source: contract
           contract-path: ota.yaml
