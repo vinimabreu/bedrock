@@ -180,12 +180,14 @@ nondeterminism, which is exactly what is measured.
 python tests/test_equivalence.py
 python tests/test_harness.py
 python tests/test_gate.py
+python tests/test_hardening.py
 ```
 
-19 tests, stdlib only, no API key. The harness tests build a fixture by hand so
+28 tests, stdlib only, no API key. The harness tests build a fixture by hand so
 the intended verdict is known, then assert the harness rediscovers it from the
 runs alone; the gate tests prove it blocks a real regression and never fails an
-improvement.
+improvement; the hardening tests each pin a fix from an adversarial review, so a
+confirmed finding cannot quietly come back.
 
 ## Roadmap
 
